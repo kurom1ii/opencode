@@ -61,6 +61,8 @@
     "open": "10.1.2",
     "opentui-spinner": "catalog:",
     "remeda": "catalog:",
+    "figlet": "^1.7.0",
+    "gradient-string": "^2.0.2",
     "strip-ansi": "7.1.2",
     "solid-js": "catalog:"
   },
