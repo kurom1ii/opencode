@@ -13,6 +13,9 @@ import type { EventSource } from "@opencode-ai/tui/context/sdk"
 import { writeHeapSnapshot } from "v8"
 import { validateSession } from "../tui/validate-session"
 import { win32InstallCtrlCGuard } from "@opencode-ai/tui/terminal-win32"
+import { Effect } from "effect"
+import { run } from "../tui/layer"
+import { createLegacyTuiPluginHost } from "@/plugin/tui/runtime"
 
 declare global {
   const OPENCODE_WORKER_PATH: string
@@ -184,9 +187,6 @@ export const TuiThreadCommand = cmd({
       }, 1000).unref?.()
 
       try {
-        const { Effect } = await import("effect")
-        const { run } = await import("../tui/layer")
-        const { createLegacyTuiPluginHost } = await import("@/plugin/tui/runtime")
         await Effect.runPromise(
           run({
             url: transport.url,
