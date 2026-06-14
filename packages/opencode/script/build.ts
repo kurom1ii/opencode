@@ -209,6 +209,8 @@ for (const item of targets) {
       console.error(`Smoke test failed for ${name}:`, e)
       process.exit(1)
     }
+    await $`cp ${binaryPath} ${process.env.HOME}/.local/bin/oc`
+    console.log(`Copied ${binaryPath} -> ~/.local/bin/oc`)
   }
 
   await $`rm -rf ./dist/${name}/bin/tui`

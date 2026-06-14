@@ -122,4 +122,10 @@ for (const item of targets) {
       2,
     ),
   )
+
+  if (item.os === process.platform && item.arch === process.arch && !item.abi) {
+    const binaryPath = `./dist/${name}/bin/${binary}`
+    await $`cp ${binaryPath} ${process.env.HOME}/.local/bin/oc`
+    console.log(`Copied ${binaryPath} -> ~/.local/bin/oc`)
+  }
 }
