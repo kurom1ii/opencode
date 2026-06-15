@@ -2,6 +2,25 @@
 - The default branch in this repo is `dev`.
 - Local `main` ref may not exist; use `dev` or `origin/dev` for diffs.
 
+## Merge từ origin/dev về kuromi-dev
+
+```sh
+git fetch origin dev && \
+  git merge origin/dev -m "merge: pull latest from origin/dev" && \
+  cd packages/opencode && bun typecheck && cd - && \
+  git push fork kuromi-dev
+```
+
+Nếu merge có conflict thì resolve, sau đó `git rerere` sẽ ghi nhớ tự động cho lần sau.
+
+Nếu push bị reject (non-fast-forward), rebase:
+
+```sh
+git pull fork kuromi-dev --rebase
+# resolve conflicts nếu có
+git push fork kuromi-dev
+```
+
 ## Branch Names
 
 Use a short branch name of at most three words, separated by hyphens. Do not use slashes or type prefixes such as `feat/` or `fix/`.
