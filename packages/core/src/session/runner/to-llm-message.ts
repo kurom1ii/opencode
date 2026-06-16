@@ -23,7 +23,7 @@ function appendDeepSeekDateContext(messages: Message[], model: Model) {
     Message.make({
       id: target.id,
       role: target.role,
-      content: [...target.content, Message.text(`Today's date: ${new Date().toDateString()}`)],
+      content: [...target.content, Message.text(`Date: ${new Date().toDateString()}`)],
       metadata: target.metadata,
       native: target.native,
     }),
