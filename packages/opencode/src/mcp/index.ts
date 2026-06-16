@@ -157,6 +157,7 @@ interface State {
 }
 
 export interface Interface {
+  readonly init: () => Effect.Effect<void>
   readonly status: () => Effect.Effect<Record<string, Status>>
   readonly clients: () => Effect.Effect<Record<string, MCPClient>>
   readonly tools: () => Effect.Effect<Record<string, Tool>>
@@ -562,6 +563,10 @@ export const layer = Layer.effect(
       return s.status[name]
     })
 
+
+    const init = Effect.fn("MCP.init")(function* () {
+      yield* InstanceState.get(state)
+    })
     const status = Effect.fn("MCP.status")(function* () {
       const s = yield* InstanceState.get(state)
 
@@ -915,6 +920,7 @@ export const layer = Layer.effect(
     })
 
     return Service.of({
+      init,
       status,
       clients,
       tools,

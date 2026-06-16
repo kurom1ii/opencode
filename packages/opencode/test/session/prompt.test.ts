@@ -111,6 +111,7 @@ function errorTool(parts: SessionV1.Part[]) {
 const mcp = Layer.succeed(
   MCP.Service,
   MCP.Service.of({
+    init: () => Effect.void,
     status: () => Effect.succeed({}),
     clients: () => Effect.succeed({}),
     tools: () => Effect.succeed({}),
