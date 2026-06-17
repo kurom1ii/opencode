@@ -439,6 +439,7 @@ export const {
         .then((x) => x.data)
         .catch(() => emptyConsoleState)
       const agentsPromise = sdk.client.app.agents({ workspace }, { throwOnError: true })
+      const mcpStatusPromise = sdk.client.mcp.status({ workspace }, { throwOnError: true })
       const configPromise = sdk.client.config.get({ workspace }, { throwOnError: true })
       await Promise.all([
         providersPromise,
@@ -446,6 +447,7 @@ export const {
         agentsPromise,
         configPromise,
         projectPromise,
+        mcpStatusPromise,
         ...(args.continue ? [sessionListPromise] : []),
       ])
         .then(async () => {
@@ -454,6 +456,7 @@ export const {
           const consoleStateResponse = consoleStatePromise
           const agentsResponse = agentsPromise.then((x) => x.data ?? [])
           const configResponse = configPromise.then((x) => x.data!)
+          const mcpStatusResponse = mcpStatusPromise.then((x) => x.data ?? {})
           const sessionListResponse = args.continue ? sessionListPromise : undefined
 
           return Promise.all([
@@ -462,6 +465,7 @@ export const {
             consoleStateResponse,
             agentsResponse,
             configResponse,
+            mcpStatusResponse,
             ...(sessionListResponse ? [sessionListResponse] : []),
           ]).then((responses) => {
             const providers = responses[0]
@@ -469,7 +473,8 @@ export const {
             const consoleState = responses[2]
             const agents = responses[3]
             const config = responses[4]
-            const sessions = responses[5]
+            const mcpStatus = responses[5]
+            const sessions = responses[6]
 
             batch(() => {
               setStore("provider", reconcile(providers.providers))
@@ -478,6 +483,7 @@ export const {
               setStore("console_state", reconcile(consoleState))
               setStore("agent", reconcile(agents))
               setStore("config", reconcile(config))
+              setStore("mcp", reconcile(mcpStatus))
               if (sessions !== undefined) setStore("session", reconcile(sessions))
             })
           })
@@ -490,7 +496,6 @@ export const {
             consoleStatePromise.then((consoleState) => setStore("console_state", reconcile(consoleState))),
             sdk.client.command.list({ workspace }).then((x) => setStore("command", reconcile(x.data ?? []))),
             sdk.client.lsp.status({ workspace }).then((x) => setStore("lsp", reconcile(x.data ?? []))),
-            sdk.client.mcp.status({ workspace }).then((x) => setStore("mcp", reconcile(x.data ?? {}))),
             sdk.client.experimental.resource
               .list({ workspace })
               .then((x) => setStore("mcp_resource", reconcile(x.data ?? {}))),

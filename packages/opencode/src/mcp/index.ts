@@ -29,7 +29,7 @@ import { EventV2Bridge } from "@/event-v2-bridge"
 import { EventV2 } from "@opencode-ai/core/event"
 import { TuiEvent } from "@/server/tui-event"
 import open from "open"
-import { Cause, Effect, Exit, Layer, Option, Context, Schema, Stream } from "effect"
+import { Cause, Effect, Exit, Layer, Option, Context, Schema, Scope, Stream } from "effect"
 import { EffectBridge } from "@/effect/bridge"
 import { InstanceState } from "@/effect/instance-state"
 import { ChildProcess, ChildProcessSpawner } from "effect/unstable/process"
@@ -483,29 +483,35 @@ export const layer = Layer.effect(
           defs: {},
         }
 
-        yield* Effect.forEach(
-          Object.entries(config),
-          ([key, mcp]) =>
-            Effect.gen(function* () {
-              if (!isMcpConfigured(mcp)) {
-                yield* Effect.logError("Ignoring MCP config entry without type", { key })
-                return
-              }
+        for (const [key, mcp] of Object.entries(config)) {
+          if (!isMcpConfigured(mcp)) continue
+          s.status[key] = mcp.enabled === false
+            ? { status: "disabled" }
+            : { status: "failed", error: "connecting…" }
+        }
 
-              if (mcp.enabled === false) {
-                s.status[key] = { status: "disabled" }
-                return
-              }
+        const scope = yield* Scope.Scope
+        yield* Effect.forkIn(scope)(
+          Effect.forEach(
+            Object.entries(config),
+            ([key, mcp]) =>
+              Effect.gen(function* () {
+                if (!isMcpConfigured(mcp)) {
+                  yield* Effect.logError("Ignoring MCP config entry without type", { key })
+                  return
+                }
+                if (mcp.enabled === false) return
 
-              const result = yield* create(key, mcp)
-              s.status[key] = result.status
-              if (result.mcpClient) {
-                s.clients[key] = result.mcpClient
-                s.defs[key] = result.defs!
-                watch(s, key, result.mcpClient, bridge, mcp.timeout)
-              }
-            }),
-          { concurrency: "unbounded" },
+                const result = yield* create(key, mcp)
+                s.status[key] = result.status
+                if (result.mcpClient) {
+                  s.clients[key] = result.mcpClient
+                  s.defs[key] = result.defs!
+                  watch(s, key, result.mcpClient, bridge, mcp.timeout)
+                }
+              }),
+            { concurrency: "unbounded" },
+          ),
         )
 
         yield* Effect.addFinalizer(() =>
