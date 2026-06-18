@@ -289,24 +289,24 @@ export const layer = Layer.effect(
                   error: "Server does not support dynamic client registration. Please provide clientId in config.",
                 }
                 return events
-                  .publish(TuiEvent.ToastShow, {
-                    title: "MCP Authentication Required",
-                    message: `Server "${key}" requires a pre-registered client ID. Add clientId to your config.`,
-                    variant: "warning",
-                    duration: 8000,
-                  })
-                  .pipe(Effect.ignore, Effect.as(undefined))
+.publish(TuiEvent.ToastShow, {
+title: "MCP Authentication Required",
+message: `Server "${key}" requires a pre-registered client ID. Add clientId to your config.`,
+variant: "warning",
+duration: 8000,
+})
+.pipe(Effect.ignore, Effect.as(undefined))
               } else {
                 pendingOAuthTransports.set(key, transport)
                 lastStatus = { status: "needs_auth" as const }
                 return events
-                  .publish(TuiEvent.ToastShow, {
-                    title: "MCP Authentication Required",
-                    message: `Server "${key}" requires authentication. Run: opencode mcp auth ${key}`,
-                    variant: "warning",
-                    duration: 8000,
-                  })
-                  .pipe(Effect.ignore, Effect.as(undefined))
+.publish(TuiEvent.ToastShow, {
+title: "MCP Authentication Required",
+message: `Server "${key}" requires authentication. Run: opencode mcp auth ${key}`,
+variant: "warning",
+duration: 8000,
+})
+.pipe(Effect.ignore, Effect.as(undefined))
               }
             }
 
@@ -315,7 +315,6 @@ export const layer = Layer.effect(
           }),
         )
         if (result) return { client: result.client, status: { status: "connected" } as Status }
-        // If this was an auth error, stop trying other transports
         if (lastStatus?.status === "needs_auth" || lastStatus?.status === "needs_client_registration") break
       }
 
@@ -510,7 +509,7 @@ export const layer = Layer.effect(
                   watch(s, key, result.mcpClient, bridge, mcp.timeout)
                 }
               }),
-            { concurrency: "unbounded" },
+          { concurrency: "unbounded" },
           ),
         )
 
