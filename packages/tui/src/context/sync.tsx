@@ -407,6 +407,10 @@ export const {
           break
         }
 
+        case "mcp.tools.changed": {
+          void sdk.client.mcp.status({ workspace }).then((x) => setStore("mcp", reconcile(x.data ?? {})))
+          break
+        }
         case "lsp.updated": {
           const workspace = project.workspace.current()
           void sdk.client.lsp.status({ workspace }).then((x) => setStore("lsp", x.data ?? []))

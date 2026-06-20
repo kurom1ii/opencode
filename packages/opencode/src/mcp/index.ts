@@ -509,7 +509,9 @@ duration: 8000,
                   watch(s, key, result.mcpClient, bridge, mcp.timeout)
                 }
               }),
-          { concurrency: "unbounded" },
+            { concurrency: "unbounded" },
+          ).pipe(
+            Effect.andThen(events.publish(ToolsChanged, { server: "" }).pipe(Effect.ignore)),
           ),
         )
 
