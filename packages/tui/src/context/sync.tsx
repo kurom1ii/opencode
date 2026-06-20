@@ -490,6 +490,7 @@ export const {
             const capabilities = responses[2]
             const consoleState = responses[3]
             const agents = responses[4]
+            const config = responses[5]
             const mcpStatus = responses[6]
             const sessions = responses[7]
 
